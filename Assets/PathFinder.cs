@@ -14,17 +14,9 @@ public class PathFinder : MonoBehaviour {
 
 	public void Start () {
 		instance = this;
-		//StartCoroutine("RandomPaths");
 	}
 
 	public void Update () {
-	}
-
-	IEnumerator RandomPaths() {
-		while(true){
-			AStar (0, 0, (int)Random.Range(0, Map.width), (int)Random.Range (0, Map.height));
-			yield return new WaitForSeconds(1f);
-		}
 	}
 
 	public List<Vector2> AStar (int startingX, int startingY, int targetX, int targetY) {

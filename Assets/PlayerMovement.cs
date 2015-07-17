@@ -13,36 +13,46 @@ public class PlayerMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(Input.GetMouseButtonDown(0))
-		{
-			var posVec = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-			posVec.z = transform.position.z;
-			
-			path = PathFinder.instance.AStar ((int)transform.position.x, (int)transform.position.y, (int)posVec.x, (int)posVec.y);
-			if(isMoving)
-				StopCoroutine("MoveOnPath");
-			StartCoroutine("MoveOnPath");
-		}
 	}
 
 	void OnEnable () {
 		TurnManager.PlayerTurn += MoveButton;
+		EventManager.OnLeftMouseClick += OnMouseClick;
 	}
 
 	void OnDisable () {
 		TurnManager.PlayerTurn -= MoveButton;
+		EventManager.OnLeftMouseClick += OnMouseClick;
+	}
+
+	void OnMouseClick(Vector3 position) {
+		path = PathFinder.instance.AStar ((int)transform.position.x, (int)transform.position.y, (int)position.x, (int)position.y);
+		if(isMoving)
+			StopCoroutine("MoveOnPath");
+		StartCoroutine("MoveOnPath");
 	}
 
 	IEnumerator MoveOnPath() {
 		isMoving = true;
 		while(path != null && path.Count > 0) {
-			transform.position = new Vector3(path[path.Count - 1].x + 0.5f, path[path.Count - 1].y + 0.5f);
+			Move(path[path.Count - 1]);
 			path.RemoveAt(path.Count - 1);
 			
 			yield return new WaitForSeconds(0.05f);
 		}
 		isMoving = false;
 		yield return null;
+	}
+
+	void Move (Vector3 position) {
+		if(position.x + 0.5f > transform.position.x) {
+			transform.localScale = new Vector3(1, 1, 1);
+		}
+		else if(position.x + 0.5f < transform.position.x) {
+			transform.localScale = new Vector3(-1, 1, 1);
+		}
+
+		transform.position = new Vector3(position.x + 0.5f, position.y + 0.5f);
 	}
 
 	void Move (string direction) {
