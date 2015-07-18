@@ -12,6 +12,8 @@ public class PathFinder : MonoBehaviour {
 	List<node> openList;
 	List<node> closedList;
 
+	private bool cutCorners = true;
+
 	public void Start () {
 		instance = this;
 	}
@@ -19,12 +21,12 @@ public class PathFinder : MonoBehaviour {
 	public void Update () {
 	}
 
+	public List<Vector2> AStar (int startingX, int startingY, int targetX, int targetY, bool cutCorners) {
+		this.cutCorners = cutCorners;
+		return AStar (startingX, startingY, targetX, targetY);
+	}
+
 	public List<Vector2> AStar (int startingX, int startingY, int targetX, int targetY) {
-
-		foreach (Transform child in transform){
-			Destroy(child.gameObject);
-		}
-
 
 		openList = new List<node>();
 		closedList = new List<node>();
@@ -91,32 +93,40 @@ public class PathFinder : MonoBehaviour {
 		EvaluateNode(tile, currentNode, targetNode, 10);
 
 		// above right
-		tile = new Vector2(currentNode.tile.x + 1, currentNode.tile.y + 1);
-		EvaluateNode(tile, currentNode, targetNode, 14);
+		if (cutCorners) {
+			tile = new Vector2 (currentNode.tile.x + 1, currentNode.tile.y + 1);
+			EvaluateNode (tile, currentNode, targetNode, 14);
+		}
 
 		// right
 		tile = new Vector2(currentNode.tile.x + 1, currentNode.tile.y);
 		EvaluateNode(tile, currentNode, targetNode, 10);
 
 		// below right
-		tile = new Vector2(currentNode.tile.x + 1, currentNode.tile.y - 1);
-		EvaluateNode(tile, currentNode, targetNode, 14);
+		if (cutCorners) {
+			tile = new Vector2 (currentNode.tile.x + 1, currentNode.tile.y - 1);
+			EvaluateNode (tile, currentNode, targetNode, 14);
+		}
 
 		// below
 		tile = new Vector2(currentNode.tile.x, currentNode.tile.y - 1);
 		EvaluateNode(tile, currentNode, targetNode, 10);
 
 		// below left
-		tile = new Vector2(currentNode.tile.x - 1, currentNode.tile.y - 1);
-		EvaluateNode(tile, currentNode, targetNode, 14);
+		if (cutCorners) {
+			tile = new Vector2 (currentNode.tile.x - 1, currentNode.tile.y - 1);
+			EvaluateNode (tile, currentNode, targetNode, 14);
+		}
 
 		// left
 		tile = new Vector2(currentNode.tile.x - 1, currentNode.tile.y);
 		EvaluateNode(tile, currentNode, targetNode, 10);
 
 		// above left
-		tile = new Vector2(currentNode.tile.x - 1, currentNode.tile.y + 1);
-		EvaluateNode(tile, currentNode, targetNode, 14);
+		if (cutCorners) {
+			tile = new Vector2 (currentNode.tile.x - 1, currentNode.tile.y + 1);
+			EvaluateNode (tile, currentNode, targetNode, 14);
+		}
 	}
 
 	node GetNodeFromOpenList (Vector2 tile) {

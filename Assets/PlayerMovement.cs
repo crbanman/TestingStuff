@@ -26,7 +26,7 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void OnMouseClick(Vector3 position) {
-		path = PathFinder.instance.AStar ((int)transform.position.x, (int)transform.position.y, (int)position.x, (int)position.y);
+		path = PathFinder.instance.AStar ((int)transform.position.x, (int)transform.position.y, (int)position.x, (int)position.y, true);
 		if(isMoving)
 			StopCoroutine("MoveOnPath");
 		StartCoroutine("MoveOnPath");
