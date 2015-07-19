@@ -14,6 +14,8 @@ public class PathFinder : MonoBehaviour {
 
 	private bool cutCorners = true;
 
+	private int[,] map;
+
 	public void Start () {
 		instance = this;
 	}
@@ -26,6 +28,10 @@ public class PathFinder : MonoBehaviour {
 		return AStar (startingX, startingY, targetX, targetY);
 	}
 
+
+	/**
+	 * This is used for moving player/enemies.
+	 */
 	public List<Vector2> AStar (int startingX, int startingY, int targetX, int targetY) {
 
 		openList = new List<node>();
@@ -75,6 +81,49 @@ public class PathFinder : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * This is used for digging paths from room to room on level generation.
+	 */
+	public List<Vector2> AStar (int[,] map, float startingX, float startingY, float targetX, float targetY) {
+
+		this.map = map;
+		
+		openList = new List<node>();
+		closedList = new List<node>();
+		
+		Vector2 startingTile = new Vector2(startingX, startingY);
+		Vector2 targetTile = new Vector2(targetX, targetY);
+		
+		node startingNode = new node(startingTile, null, 0, 0);
+		node targetNode = new node(targetTile, null, 0, 0);
+		
+		bool pathFound = false;
+		
+		// Add starting node to the open list.
+		openList.Add(startingNode);
+		
+		do{
+			// Look for the lowest F cost square on the open list.
+			node currentNode = LowestCostingNode(openList);
+			
+			// Remove current node from open list.
+			openList.Remove(currentNode);
+			
+			// Add current node to closed list.
+			closedList.Add (currentNode);
+			
+			// Evaluate adjacent nodes.
+			AddAjacentNodes(currentNode, targetNode);
+			
+			if(GetNodeFromClosedList(targetTile) != null) {
+				pathFound = true;
+			}
+			
+		} while (!pathFound);
+
+		return GetPath(GetNodeFromClosedList(targetTile));
+	}
+
 	node LowestCostingNode(List<node> list) {
 		node lowestCost = null;
 		foreach (node node in list) {
@@ -83,6 +132,26 @@ public class PathFinder : MonoBehaviour {
 			}
 		}
 		return lowestCost;
+	}
+
+	void AddAjacentNodes(node currentNode, node targetNode) {
+		Vector2 tile;
+		
+		// above
+		tile = new Vector2(currentNode.tile.x, currentNode.tile.y + 1);
+		EvaluateNode(tile, currentNode, targetNode);
+		
+		// right
+		tile = new Vector2(currentNode.tile.x + 1, currentNode.tile.y);
+		EvaluateNode(tile, currentNode, targetNode);
+		
+		// below
+		tile = new Vector2(currentNode.tile.x, currentNode.tile.y - 1);
+		EvaluateNode(tile, currentNode, targetNode);
+		
+		// left
+		tile = new Vector2(currentNode.tile.x - 1, currentNode.tile.y);
+		EvaluateNode(tile, currentNode, targetNode);
 	}
 
 	void AddAjacentWalkableNodes(node currentNode, node targetNode) {
@@ -145,6 +214,34 @@ public class PathFinder : MonoBehaviour {
 			}
 		}
 		return null;
+	}
+
+	void EvaluateNode (Vector2 tile, node currentNode, node targetNode) {
+		if((tile.x < GenerateLevel.width && tile.x >= 0 && tile.y >= 0 && tile.y < GenerateLevel.height) 
+		   && GetNodeFromClosedList(tile) == null) {
+			int movementCost = map[(int)tile.x, (int)tile.y];
+
+			// Check if node is in the open list
+			node node = GetNodeFromOpenList(tile);
+			
+			if(node == null){
+				if (tile.x == targetNode.tile.x && tile.y == targetNode.tile.y) {
+					movementCost = 0;
+				}
+				int g = currentNode.g + movementCost;
+				int h = CalculateH (currentNode, targetNode);
+				openList.Add (new node(tile, currentNode, g, h));
+			}
+			else {
+				if (node.g > currentNode.g + movementCost) {
+					openList.Remove(node);
+					node.parentNode = currentNode;
+					node.g = currentNode.g + movementCost;
+					node.f = node.g + node.h;
+					openList.Add (node);
+				}
+			}
+		}
 	}
 
 	void EvaluateNode (Vector2 tile, node currentNode, node targetNode, int movementCost) {
