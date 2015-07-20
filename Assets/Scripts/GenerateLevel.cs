@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class GenerateLevel : MonoBehaviour {
 
+	public GameObject player;
+
 	public GameObject wall;
 	public GameObject door;
 	public GameObject floor;
@@ -29,6 +31,12 @@ public class GenerateLevel : MonoBehaviour {
 		PlaceRooms ();
 		DigPaths ();
 		InstantiateMap();
+		PlacePlayer();
+		Map.instance.InitializeMap();
+	}
+
+	public void PlacePlayer() {
+		Instantiate(player, rooms[0].position + new Vector2(rooms[0].width / 2 + 0.5f, rooms[0].height/2 + 0.5f), Quaternion.identity);
 	}
 
 	void FillMap () {

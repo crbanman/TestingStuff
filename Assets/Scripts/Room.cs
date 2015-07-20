@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class Room {
 
-	public static int MINIMUM_SIZE = 4;
-	public static int MAXIMUM_SIZE = 8;
+	public static int MINIMUM_SIZE = 5;
+	public static int MAXIMUM_SIZE = 9;
 
 	public Vector2 position;
 	public int width;

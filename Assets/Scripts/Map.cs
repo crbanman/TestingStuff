@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Map : MonoBehaviour {
 
+	public static Map instance;
+
 	public static float xMin = 0;
 	public static float yMin = 0;
 
@@ -14,42 +16,44 @@ public class Map : MonoBehaviour {
 
 	public static GroundTile[,] walkableTiles;
 
-	// Use this for initialization
-	void Awake () {
-		IdentifyMaxPosition();
-		IdentifyWalkableTiles ();
 
+	void Awake() {
+		if (instance == null) {
+			instance = this;
+		}
 	}
 
+	public void InitializeMap () {
+		IdentifyMaxPosition();
+		IdentifyWalkableTiles ();
+	}
+
+
+
 	void IdentifyMaxPosition () {
-		foreach (Transform child in transform) {
-			if(child.position.x < xMin)
-				xMin = child.position.x;
-			if(child.position.y < yMin)
-				yMin = child.position.y;
-			if(child.position.x > xMax)
-				xMax = child.position.x;
-			if(child.position.y > yMax)
-				yMax = child.position.y;
-		}
-		width = (int) (xMax + -xMin) + 1;
-		height = (int) (yMax + -yMin) + 1;
-		Debug.Log ("Max Position is (" + xMax + ", " + yMax + ")");
+		xMin = 0;
+		xMax = width - 1;
+		yMin = 0;
+		yMax = height - 1;
+		width = GenerateLevel.width;
+		height = GenerateLevel.height;
 	}
 
 	void IdentifyWalkableTiles () {
 		walkableTiles = new GroundTile[width, height];
 		
 		foreach (Transform child in transform) {
-			GroundTile tile = child.gameObject.GetComponent<GroundTile>();
-			walkableTiles[(int) -(xMin - tile.transform.position.x), (int) -(yMin - tile.transform.position.y)] = tile;
+			if (child.tag == "Floor"){
+				GroundTile tile = child.gameObject.GetComponent<GroundTile>();
+				walkableTiles[(int) tile.transform.position.x, (int) tile.transform.position.y] = tile;
+			}
 		}
 	}
 
 	public static bool IsTileWalkable(float x, float y) {
-		if(x < xMin || y < yMin || x > xMax || y > yMax || walkableTiles[(int) -(xMin - x), (int) -(yMin - y)] == null) {
+		if(x < xMin || y < yMin || x > xMax || y > yMax || walkableTiles[(int)x, (int) y] == null) {
 			return false;
 		}
-		return walkableTiles[(int) -(xMin - x), (int) -(yMin - y)].isWalkable();
+		return walkableTiles[(int)x, (int) y].isWalkable();
 	}
 }
