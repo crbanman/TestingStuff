@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -38,7 +38,7 @@ public class PlayerMovement : MonoBehaviour {
 			Move(path[path.Count - 1]);
 			path.RemoveAt(path.Count - 1);
 			
-			yield return new WaitForSeconds(0.05f);
+			yield return new WaitForSeconds(0.2f);
 		}
 		isMoving = false;
 		yield return null;

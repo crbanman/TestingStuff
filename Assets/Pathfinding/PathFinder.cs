@@ -18,7 +18,8 @@ public class PathFinder : MonoBehaviour {
 
 	public void Start () {
 		instance = this;
-	}
+        Map.instance.InitializeMap();
+    }
 
 	public void Update () {
 	}
@@ -33,7 +34,7 @@ public class PathFinder : MonoBehaviour {
 	 * This is used for moving player/enemies.
 	 */
 	public List<Vector2> AStar (int startingX, int startingY, int targetX, int targetY) {
-
+        
 		openList = new List<node>();
 		closedList = new List<node>();
 
@@ -76,7 +77,7 @@ public class PathFinder : MonoBehaviour {
 			return GetPath(GetNodeFromClosedList(targetTile));
 		}
 		else {
-			Debug.Log ("No Path Exists to (" + targetX + ", " + targetY + ")");
+			Debug.Log ("No Path Exists from (" + startingTile.x + ", " + startingTile.y + ") to (" + targetX + ", " + targetY + ")");
 			return null;
 		}
 	}
